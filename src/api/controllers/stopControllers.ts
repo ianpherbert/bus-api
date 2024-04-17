@@ -1,4 +1,3 @@
-import { DbController } from "../../database/DBcontroller";
 import { Stop } from "../../database/types";
 import { DbError } from "../../errors/DbErrors";
 import { DbToApi } from "../../utils.ts/mappingUtils";
