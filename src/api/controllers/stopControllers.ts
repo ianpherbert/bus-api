@@ -19,6 +19,7 @@ const typeColumnMapping: { [key in SearchStopQueryType]: keyof Stop } = {
 
 const typeNames = Object.keys(typeColumnMapping).reduce((a, b) => a + ", " + b);
 export const searchStop: HandlerWithQueryType<{ queryString: string, queryType: SearchStopQueryType, companies?: string }> = async ({ query, requestTime }, res) => {
+
     const { queryString, queryType, limit, exact, companies: companyString } = query;
 
     const companyList = companyString ? normaliseStringToArray(companyString).map(it => companies[it]) : companyArray;
@@ -30,11 +31,11 @@ export const searchStop: HandlerWithQueryType<{ queryString: string, queryType: 
 
     async function doCoordinateSearch({ controller, code }: Company) {
         const [lat, lon] = queryString.split(",");
-        return controller.findMultiProperty<Stop>({ stop_lat: lat, stop_lon: lon }, "stops").then(it => it.map(a => mapToApiStop(a, code)));
+        return controller.query<Stop>("stops", [["stop_lat", lat, "eq"], ["stop_lon", lon, "eq"]]).then(a => a.map(it => mapToApiStop(it, code)));
     }
 
     async function doPropertySearch({ controller, code }: Company) {
-        return controller.findSingleProperty(column, queryString, "stops", { limit, exact }).then(it => it.map(a => mapToApiStop(a, code)));
+        return controller.query<Stop>("stops", [[column, queryString, exact ? "eq" : "like"]]).then(a => a.map(it => mapToApiStop(it, code)));
     }
 
     const column = typeColumnMapping[queryType];
@@ -62,11 +63,11 @@ export const getStop: HandlerWithParamsType<{ stopId: string }> = async ({ param
     try {
         const promises = []
         for (const { controller, code } of companyArray) {
-            const promise = controller.getOneById<Stop>("stop_id", params.stopId, "stops").then(it => it && mapToApiStop(it, code));
+            const promise = controller.query<Stop>("stops", [["stop_id", params.stopId, "like"]]).then(a => a.map(it => mapToApiStop(it, code)));
             promises.push(promise);
         }
         const entries = await Promise.all(promises)
-        res.status(200).json(new QueryResponseType<Stop>(entries, params, requestTime));
+        res.status(200).json(new QueryResponseType<Stop>(entries.flat(), params, requestTime));
     } catch (e) {
         const error = e as DbError;
         res.status(error.code ?? 500).json({ message: e })

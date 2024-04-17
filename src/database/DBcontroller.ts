@@ -1,53 +1,50 @@
-import { SupabaseClient, createClient } from "@supabase/supabase-js";
-import { supabaseKey, supabaseUrl } from "../variables";
-import { DbError, DbMultipleError, DbNotFoundError } from "../errors/DbErrors";
+import { Client } from "pg";
+import { dbHost, dbName, dbPassword, dbPort, dbUser } from '../variables'
 
-type QueryOptions = {
-    exact?: boolean | string;
-    limit?: number | string;
+
+export const postgresClient = new Client({
+    host: dbHost,
+    port: dbPort,
+    database: dbName,
+    user: dbUser,
+    password: dbPassword,
+});
+
+type DbOperand = "eq" | "neq" | "like";
+
+export const functionalOperands: { [key in DbOperand]: string } = {
+    eq: "=",
+    neq: "!=",
+    like: "ilike"
 }
 
-
-function translateOptions({ exact, limit }: QueryOptions) {
-    return {
-        exact: exact ? String(exact).toLowerCase() === "true" : false,
-        limit: Number.isNaN(limit) ? 50 : Number(limit),
-    }
-}
+type DbArg<T> = [keyof T, any, DbOperand]
 
 export class DbController {
-    client: SupabaseClient<any, string, any>;
-    constructor(dbName: string) {
-        this.client = createClient(supabaseUrl, supabaseKey, { db: { schema: dbName } })
+    private client = postgresClient;
+    private schema: string;
+    constructor(schema: string) {
+        this.schema = schema;
     }
-    getOneById = async <T>(column: keyof T, value: unknown, tableName: string) => {
-        const columnName = String(column);
-        const { data, error } = await this.client.from(tableName).select().eq(columnName, value);
-        if (error) throw new DbError(error.message);
-        if (data.length > 1) throw new DbMultipleError(`${data.length} Entries found`);
-        if (!Boolean(data.length)) return undefined;
-        return data[0] as T;
+    async query<T>(tableName: string, args: DbArg<T>[]) {
+        const variableString = args.flatMap(([key, , operand], index) => `${String(key)} ${functionalOperands[operand]} $${index + 1}`).join(" AND ");
+        const variables = args.map(([, variable, operand]) => operand === "like" ? `%${String(variable).toLowerCase()}%` : variable)
+        const queryString = `SELECT * FROM ${this.schema}.${tableName} WHERE ${variableString}`;
+        const { rows: data } = await this.client.query(queryString, variables)
+        return data as T[];
     }
-    findSingleProperty = async <T>(column: keyof T, value: unknown, tableName: string, options: QueryOptions = {}) => {
-        const columnName = String(column);
-        const { exact, limit } = translateOptions(options);
-        const query = this.client.from(tableName)
-        const { data, error } = await (async () => {
-            if (exact) {
-                return await query.select()
-                    .eq(columnName, value)
-                    .limit(limit);
-            }
-
-            return await query.select()
-                .ilike(columnName, `%${String(value).toLowerCase()}%`)
-                .limit(limit);
-        })()
-        if (error) throw new DbError(error.message);
-        return data || [] as T[];
+    async checkValue<T>(tableName: string, args: Omit<DbArg<T>, "operand">[]) {
+        const variableString = args.flatMap(([key], index) => `${String(key)} = $${index + 1}`).join(" AND ");
+        const variables = args.map(([, variable]) => variable)
+        const queryString = `SELECT 1 FROM ${this.schema}.${tableName} WHERE ${variableString}`;
+        const rowCount = await this.client.query(queryString, variables).then(it => it.rowCount)
+        return Boolean(rowCount)
     }
-    findMultiProperty = async <T>(match: Partial<{ [key in keyof T]: unknown }>, tableName: string, options: QueryOptions = {}) => {
-        const { data } = await this.client.from(tableName).select().match(match)
-        return data || [] as T[];
+    getTables(tables: string[]) {
+        return tables.map(it => `${this.schema}.${it}`)
+    }
+    async customQuery<T>(queryString: string, variables?: any[]) {
+        const { rows: data } = await this.client.query(queryString, variables)
+        return data as T[];
     }
 }
