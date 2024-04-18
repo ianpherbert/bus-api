@@ -33,7 +33,5 @@ export function formatMoreThan24hourClock(timeString: string, date: Date) {
     const correctedDate = moment(date).add(moreDays, "days")
         .set("hours", correctedHour)
         .set("minute", minute)
-
-
     return correctedDate.toDate()
 }

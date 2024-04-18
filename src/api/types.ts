@@ -52,6 +52,7 @@ export class DepartureGroup {
     end_date: string;
     companyCode: string;
     stops: DepartureStop[] = [];
+    route_id: string;
     private date;
     constructor(departure: ApiDeparture, date: Date) {
         this.trip_id = departure.trip_id;
@@ -61,6 +62,7 @@ export class DepartureGroup {
         this.companyCode = departure.companyCode;
         this.stops.push(new DepartureStop(departure, date))
         this.date = date;
+        this.route_id = departure.route_id
     }
     addStop(departure: ApiDeparture) {
         this.stops.push(new DepartureStop(departure, this.date))

@@ -48,6 +48,7 @@ export type StopTime = {
 
 export type Departure = {
     arrival_time: string;
+    route_id: string;
     departure_time: string;
     trip_id: string;
     route_long_name: string;
