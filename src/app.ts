@@ -2,7 +2,7 @@ import express, { Request, Response, NextFunction } from "express";
 import stopRouter from "./api/routes/stopRoutes";
 import { PORT } from "./variables";
 import includeTimestamp from "./api/middleware/timeStamp";
-import departureRouter from "./api/routes/departureRoutes";
+import departureRouter from "./api/routes/routeRoutes";
 import { DbController, postgresClient } from "./database/DBcontroller";
 import { Stop } from "./database/types";
 
@@ -17,4 +17,4 @@ app.listen(PORT, async () => {
 
 app.use(includeTimestamp);
 app.use("/stop", stopRouter);
-app.use("/departure", departureRouter);
+app.use("/route", departureRouter);

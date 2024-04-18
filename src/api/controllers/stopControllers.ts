@@ -7,25 +7,37 @@ import { HandlerWithParamsType, HandlerWithQueryType } from "../handlerType";
 import { QueryResponseType } from "../responseType";
 import { ApiStop } from "../types";
 
+/**
+ * Enum for search stop query types.
+ */
 enum SearchStopQueryType {
     NAME = "name",
     COORDINATES = "coordinates",
 }
 
+/**
+ * Mapping from query type to database column.
+ */
 const typeColumnMapping: { [key in SearchStopQueryType]: keyof Stop } = {
     [SearchStopQueryType.NAME]: "stop_name",
     [SearchStopQueryType.COORDINATES]: "stop_lat"
 }
 
 const typeNames = Object.keys(typeColumnMapping).reduce((a, b) => a + ", " + b);
+/**
+ * Searches for stops based on a query.
+ * @param context - The query context including the query, query type, and optional company filter.
+ * @param res - The response object to send back HTTP responses.
+ * @throws Throws an error if query fails.
+ */
 export const searchStop: HandlerWithQueryType<{ queryString: string, queryType: SearchStopQueryType, companies?: string }> = async ({ query, requestTime }, res) => {
 
-    const { queryString, queryType, limit, exact, companies: companyString } = query;
+    const { queryString, queryType, exact, companies: companyString } = query;
 
-    const companyList = companyString ? normaliseStringToArray(companyString).map(it => companies[it]) : companyArray;
+    const companyList = companyString ? normaliseStringToArray(companyString)?.map(it => companies[it]).filter(Boolean) : companyArray;
 
-    if (!queryString || !queryType) {
-        res.status(400).json({ message: "queryString and queryType are obligatory" })
+    if (queryString && !queryType) {
+        res.status(400).json({ message: "queryType is mandatory with queryString" })
         return;
     }
 
@@ -59,6 +71,12 @@ export const searchStop: HandlerWithQueryType<{ queryString: string, queryType: 
     res.status(200).json(new QueryResponseType<ApiStop>(entries.flat(), query, requestTime));
 }
 
+/**
+ * Retrieves a stop by ID.
+ * @param params - The handler parameters including the stop ID.
+ * @param res - The response object to send back HTTP responses.
+ * @throws Throws an error if query fails.
+ */
 export const getStop: HandlerWithParamsType<{ stopId: string }> = async ({ params, requestTime }, res) => {
     try {
         const promises = []
@@ -74,6 +92,12 @@ export const getStop: HandlerWithParamsType<{ stopId: string }> = async ({ param
     }
 }
 
+/**
+ * Maps a database Stop object to an API Stop object.
+ * @param stop - The stop object from the database.
+ * @param companyCode - The code of the company to attribute the stop to.
+ * @returns The API model of the stop.
+ */
 function mapToApiStop(stop: Stop, companyCode: string) {
     return DbToApi<Stop, ApiStop>(stop, [{ key: "companyCode", value: companyCode }])
 }

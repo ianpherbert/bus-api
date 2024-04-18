@@ -4,10 +4,13 @@ export enum DateFormat {
     DB = "YYYYMMDD"
 }
 
+export function getStringForNow(dateFormat = DateFormat.DB) {
+    return formatDate(new Date(), dateFormat)
+}
+
 export function parseDate(date: string, dateFormat = DateFormat.DB) {
     return moment.utc(date, "YYYYMMDD").toDate();
 }
-
 
 export function formatDate(date: Date, dateFormat = DateFormat.DB) {
     return moment(date).format(dateFormat);

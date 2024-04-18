@@ -1,20 +1,39 @@
 import { Departure, Stop } from "../../database/types";
-import { getDayOfWeek, parseDate } from "../../utils.ts/dateUtils";
+import { getDayOfWeek, getStringForNow, parseDate } from "../../utils.ts/dateUtils";
+import { DbToApi } from "../../utils.ts/mappingUtils";
+import { Company, companyArray } from "../companies";
 import { HandlerWithQueryAndParamsType } from "../handlerType";
 import { QueryResponseType } from "../responseType";
-import { DepartureGroup } from "../types";
-import { findCompany, mapToApiStop } from "./departureControllers";
+import { ApiDeparture, DepartureGroup } from "../types";
 
+/**
+ * Asynchronously finds companies that match a given criteria in a database table.
+ * @param key - The database column to search against.
+ * @param value - The value to match in the specified database column.
+ * @param tableName - The name of the database table to search.
+ * @returns  - A promise that resolves to an array of companies that match the given criteria.
+ */
+export async function findCompany<T>(key: keyof T, value: string, tableName: string) {
+    const companies: Company[] = [];
+    const promises = companyArray.map((company) => company.controller.checkValue<T>(tableName, [[key, value, "eq"]]).then(found => {
+        if (found) companies.push(company)
+    }));
+    await Promise.all(promises);
+    return companies
+}
 
-export const getDeparturesForStop: HandlerWithQueryAndParamsType<{ date: string; }, { stopId: string; }> = async ({ params, query }, res, next) => {
+/**
+ * Handler to get departures for a specified stop on a given date.
+ */
+export const getRoutesForStop: HandlerWithQueryAndParamsType<{ date: string; }, { stopId: string; }> = async ({ params, query }, res, next) => {
     const companies = await findCompany<Stop>("stop_id", params.stopId, "stops");
+    const startDate = query.date ?? getStringForNow();
     const promises = [];
     for (const { controller, code } of companies) {
         try {
             const [trips, routes, calendars, stopTimes, stops] = controller.getTables(["trips", "routes", "calendars", "stop_times", "stops"]);
-            const startDate = query.date;
             const variables = [params.stopId, startDate];
-            const dayOfWeek = getDayOfWeek(parseDate(query.date));
+            const dayOfWeek = getDayOfWeek(parseDate(startDate));
             const queryString = `
             WITH RelevantTrips AS (
                 SELECT 
@@ -72,7 +91,7 @@ export const getDeparturesForStop: HandlerWithQueryAndParamsType<{ date: string;
     const groups: { [key: string]: DepartureGroup; } = {};
     for (const item of data.flat()) {
         if (!groups[item.trip_id]) {
-            groups[item.trip_id] = new DepartureGroup(item, parseDate(query.date));
+            groups[item.trip_id] = new DepartureGroup(item, parseDate(startDate));
         } else {
             groups[item.trip_id].addStop(item);
         }
@@ -80,3 +99,13 @@ export const getDeparturesForStop: HandlerWithQueryAndParamsType<{ date: string;
 
     res.status(200).json(new QueryResponseType(Object.values(groups), { ...query, ...params }));
 };
+
+/**
+ * Converts a database Departure object to an API-conformant Departure object.
+ * @param stop - The departure data retrieved from the database.
+ * @param companyCode - The company code to include in the API data.
+ * @returns The API-formatted departure data.
+ */
+export function mapToApiStop(stop: Departure, companyCode: string) {
+    return DbToApi<Departure, ApiDeparture>(stop, [{ key: "companyCode", value: companyCode }])
+}
