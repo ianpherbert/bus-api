@@ -41,7 +41,23 @@ export type Stop = {
 export type StopTime = {
     trip_id: string;
     stop_id: string;
-    arrival_time: string;  // Assuming time is in string format
-    departure_time: string;  // Assuming time is in string format
+    arrival_time: string;
+    departure_time: string;
     stop_sequence: number;
 };
+
+export type Departure = {
+    arrival_time: string;
+    route_id: string;
+    departure_time: string;
+    trip_id: string;
+    route_long_name: string;
+    start_date: string;
+    end_date: string;
+    stop_name: string;
+    stop_lat: string;
+    stop_lon: string;
+    stop_id: string
+    stop_sequence: number;
+    stop_timezone: string;
+}
