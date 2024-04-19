@@ -4,14 +4,6 @@ import { TimestampedRequest } from "../handlerType";
 import { getRoutesForDay, getRoutesForStop } from "./routeControllers";
 import { waitFor } from "../../utils.ts/testUtils";
 
-const mockStops = [{
-    stop_id: "1001",
-    stop_name: "Central Station",
-    stop_lat: 48.8566,
-    stop_lon: 2.3522,
-    stop_timezone: "Europe/Paris"
-}]
-
 function generateMockDepartures(num: number): Departure[] {
     const departures: Departure[] = [];
 
@@ -44,7 +36,7 @@ jest.mock('../companies', () => ({
                 customQuery: (_: string, _1: [string, string][]) => {
                     return new Promise((res) => res(generateMockDepartures(50)))
                 },
-                getTables: (tables: string[]) => {
+                getTableNames: (tables: string[]) => {
                     return tables.map(it => `${"test"}.${it}`)
                 }
             }, code: "C1"
@@ -56,7 +48,7 @@ jest.mock('../companies', () => ({
             customQuery: (_: string, _1: [string, string][]) => {
                 return new Promise((res) => res(generateMockDepartures(50)))
             },
-            getTables: (tables: string[]) => {
+            getTableNames: (tables: string[]) => {
                 return tables.map(it => `${"test"}.${it}`)
             }
         }, code: "C1"

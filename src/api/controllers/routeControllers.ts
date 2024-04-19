@@ -42,9 +42,8 @@ export const getRoutesForStop: HandlerWithQueryAndParamsType<{ date: string; }, 
     const startDate = query.date ?? getStringForNow();
     const promises = [];
     for (const { controller, code } of companies) {
-        console.log(companies)
         try {
-            const [trips, routes, calendars, stopTimes, stops] = controller.getTables(["trips", "routes", "calendars", "stop_times", "stops"]);
+            const [trips, routes, calendars, stopTimes, stops] = controller.getTableNames(["trips", "routes", "calendars", "stop_times", "stops"]);
             const variables = [params.stopId, startDate];
             const dayOfWeek = getDayOfWeek(parseDate(startDate));
             const queryString = `
@@ -111,7 +110,7 @@ export const getRoutesForDay: HandlerWithQueryType<{ date: string; page: string 
     const offset = query.page ? Number(query.page) : 0;
     for (const { controller, code } of companyArray) {
         try {
-            const [trips, routes, calendars, stopTimes, stops] = controller.getTables(["trips", "routes", "calendars", "stop_times", "stops"]);
+            const [trips, routes, calendars, stopTimes, stops] = controller.getTableNames(["trips", "routes", "calendars", "stop_times", "stops"]);
             const variables = [startDate];
             const dayOfWeek = getDayOfWeek(parseDate(startDate));
             const queryString = `
@@ -175,7 +174,6 @@ export const getRoutesForDay: HandlerWithQueryType<{ date: string; page: string 
     }
     const data = await Promise.all(promises);
     const groups = groupDepartures(data, startDate);
-    console.log(Object.values(groups).length)
     res.status(200).json(new QueryResponseType(Object.values(groups), { ...query }));
 }
 

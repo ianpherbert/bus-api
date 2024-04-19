@@ -10,7 +10,6 @@ const app = express();
 
 app.listen(PORT, async () => {
   await postgresClient.connect();
-  console.log("Server running at PORT: ", PORT);
 }).on("error", (error) => {
   throw new Error(error.message);
 });
