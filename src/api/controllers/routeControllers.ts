@@ -42,6 +42,7 @@ export const getRoutesForStop: HandlerWithQueryAndParamsType<{ date: string; }, 
     const startDate = query.date ?? getStringForNow();
     const promises = [];
     for (const { controller, code } of companies) {
+        console.log(companies)
         try {
             const [trips, routes, calendars, stopTimes, stops] = controller.getTables(["trips", "routes", "calendars", "stop_times", "stops"]);
             const variables = [params.stopId, startDate];
@@ -101,7 +102,6 @@ export const getRoutesForStop: HandlerWithQueryAndParamsType<{ date: string; }, 
     const data = await Promise.all(promises);
 
     const groups = groupDepartures(data, startDate);
-
     res.status(200).json(new QueryResponseType(Object.values(groups), { ...query, ...params }));
 };
 

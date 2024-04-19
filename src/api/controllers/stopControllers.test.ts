@@ -1,7 +1,6 @@
 import { getMockReq, getMockRes } from '@jest-mock/express'
 import { getStop, searchStop } from './stopControllers';
 import { TimestampedRequest } from '../handlerType';
-import { companies } from '../companies';
 import { waitFor } from '../../utils.ts/testUtils';
 
 const mockStops = [{
@@ -44,8 +43,7 @@ jest.mock('../companies', () => ({
     companies: {
         "Company1": {
             controller: {
-                query: (query: string, variables: [string, string][]) => {
-                    console.log("c1", query, variables)
+                query: (_: string, _1: [string, string][]) => {
                     return new Promise((res) => res(mockStops))
                 }
             }, code: "C1"
@@ -53,8 +51,7 @@ jest.mock('../companies', () => ({
     },
     companyArray: [{
         controller: {
-            query: (query: string, variables: [string, string][]) => {
-                console.log("c1", query, variables)
+            query: (_: string, _1: [string, string][]) => {
                 return new Promise((res) => res(mockStops))
             }
         }, code: "C1"
@@ -98,12 +95,14 @@ describe('searchStop', () => {
     });
 });
 
-describe("getstop", async () => {
-    const req = getMockReq({ params: { stopId: "945" } }) as Omit<TimestampedRequest, "params"> & { params: any };
-    const { res } = getMockRes();
-    getStop(req, res, jest.fn());
-    await waitFor(() => {
-        expect(res.status).toHaveBeenCalledWith(200);
-        expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ count: mockStops.length }));
-    }, 500)
+describe("getstop", () => {
+    test("", async () => {
+        const req = getMockReq({ params: { stopId: "945" } }) as Omit<TimestampedRequest, "params"> & { params: any };
+        const { res } = getMockRes();
+        getStop(req, res, jest.fn());
+        await waitFor(() => {
+            expect(res.status).toHaveBeenCalledWith(200);
+            expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ count: mockStops.length }));
+        }, 500)
+    })
 })
