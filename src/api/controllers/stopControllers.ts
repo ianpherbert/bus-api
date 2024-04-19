@@ -1,6 +1,6 @@
 import { Stop } from "../../database/types";
 import { DbError } from "../../errors/DbErrors";
-import { DbToApi } from "../../utils.ts/mappingUtils";
+import { dbToApi } from "../../utils.ts/mappingUtils";
 import { normaliseStringToArray } from "../../utils.ts/stringUtils";
 import { Company, companies, companyArray } from "../companies";
 import { HandlerWithParamsType, HandlerWithQueryType } from "../handlerType";
@@ -99,5 +99,5 @@ export const getStop: HandlerWithParamsType<{ stopId: string }> = async ({ param
  * @returns The API model of the stop.
  */
 function mapToApiStop(stop: Stop, companyCode: string) {
-    return DbToApi<Stop, ApiStop>(stop, [{ key: "companyCode", value: companyCode }])
+    return dbToApi<Stop, ApiStop>(stop, [{ key: "companyCode", value: companyCode }])
 }

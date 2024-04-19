@@ -1,6 +1,6 @@
 import { Departure, Stop } from "../../database/types";
 import { getDayOfWeek, getStringForNow, parseDate } from "../../utils.ts/dateUtils";
-import { DbToApi } from "../../utils.ts/mappingUtils";
+import { dbToApi } from "../../utils.ts/mappingUtils";
 import { Company, companyArray } from "../companies";
 import { HandlerWithQueryAndParamsType, HandlerWithQueryType } from "../handlerType";
 import { QueryResponseType } from "../responseType";
@@ -186,5 +186,5 @@ export const getRoutesForDay: HandlerWithQueryType<{ date: string; page: string 
  * @returns The API-formatted departure data.
  */
 export function mapToApiStop(stop: Departure, companyCode: string) {
-    return DbToApi<Departure, ApiDeparture>(stop, [{ key: "companyCode", value: companyCode }])
+    return dbToApi<Departure, ApiDeparture>(stop, [{ key: "companyCode", value: companyCode }])
 }

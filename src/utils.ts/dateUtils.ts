@@ -29,9 +29,9 @@ export function getDayOfWeek(date: Date) {
 export function formatMoreThan24hourClock(timeString: string, date: Date) {
     const [hour, minute] = timeString.split(":").map(Number);
     const moreDays = hour % 24;
-    const correctedHour = hour - (24 * moreDays);
+    const correctedHour = hour - (24 * moreDays - 1);
     const correctedDate = moment(date).add(moreDays, "days")
-        .set("hours", correctedHour)
+        .set("hour", correctedHour)
         .set("minute", minute)
     return correctedDate.toDate()
 }

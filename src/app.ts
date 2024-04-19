@@ -18,3 +18,6 @@ app.listen(PORT, async () => {
 app.use(includeTimestamp);
 app.use("/stop", stopRouter);
 app.use("/route", departureRouter);
+app.get("/ping", (_a, b) => b.status(200).json({ message: "OK" }))
+
+export default app;
