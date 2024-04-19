@@ -1,10 +1,9 @@
-import express, { Request, Response, NextFunction } from "express";
+import express from "express";
 import stopRouter from "./api/routes/stopRoutes";
 import { PORT } from "./variables";
 import includeTimestamp from "./api/middleware/timeStamp";
 import departureRouter from "./api/routes/routeRoutes";
-import { DbController, postgresClient } from "./database/DBcontroller";
-import { Stop } from "./database/types";
+import { postgresClient } from "./database/DBcontroller";
 
 const app = express();
 
