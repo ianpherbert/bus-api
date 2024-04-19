@@ -1,45 +1,39 @@
 // Importing the necessary module and functions for testing
 import moment from 'moment';
-import { DateFormat, getStringForNow, parseDate, formatDate, weeksFromString, getDayOfWeek, formatMoreThan24hourClock } from "./dateUtils"; // Adjust './yourModule' to your actual file path
+import { getStringForNow, parseDate, formatDate, weeksFromString, getDayOfWeek, formatMoreThan24hourClock } from "./dateUtils";
 import { dbToApi } from './mappingUtils';
 import { normaliseString, normaliseStringToArray } from './stringUtils';
 
 describe('Date Utils Tests', () => {
-    // Test for getStringForNow function
     it('should return the current date in YYYYMMDD format', () => {
         jest.useFakeTimers().setSystemTime(new Date('2024-01-01'));
         expect(getStringForNow()).toBe('20240101');
         jest.useRealTimers();
     });
 
-    // Test for parseDate function
     it('should parse a date string based on the specified format', () => {
         expect(parseDate('20240101')).toEqual(new Date(Date.UTC(2024, 0, 1)));
     });
 
-    // Test for formatDate function
     it('should format a date object to a string in the specified format', () => {
         const date = new Date('2024-01-01T00:00:00Z');
         expect(formatDate(date)).toBe('20240101');
     });
 
-    // Test for weeksFromString function
     it('should add weeks to a date string and return the new date in specified format', () => {
         expect(weeksFromString('20240101', 1)).toBe('20240108');
     });
 
-    // Test for getDayOfWeek function
     it('should return the day of the week for a given date', () => {
         const date = new Date('2024-01-01T00:00:00Z');
         expect(getDayOfWeek(date)).toBe('monday');
     });
 
-    // Test for formatMoreThan24hourClock function
     it('should adjust date and time correctly for time strings representing more than 24 hours', () => {
         const date = new Date('2024-01-01T00:00:00Z');
         expect(formatMoreThan24hourClock('27:30', date)).toEqual(new Date('2024-01-02T03:30:00Z'));
     });
-    // Test for formatMoreThan24hourClock function
+
     it('should adjust date and time correctly for time strings representing more than 48 hours', () => {
         const date = new Date('2024-01-01T00:00:00Z');
         expect(formatMoreThan24hourClock('54:30', date)).toEqual(new Date('2024-01-03T06:30:00Z'));
@@ -65,8 +59,6 @@ describe("mapping utils", () => {
     })
 })
 
-
-
 describe("string utils", () => {
     test("should split string into array", () => {
         const testString = "foo, BAR, api ";
@@ -81,7 +73,6 @@ describe("string utils", () => {
         const output = normaliseStringToArray<ApiObject>(testString, ";");
         expect(expectedOutput.every((it) => output.includes(it))).toBeTruthy()
     })
-
 
     test("should normalize string, french example", () => {
         const testString = "François Bellière a raté son diplôme à cause de Gaëlle.";
