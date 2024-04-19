@@ -1,6 +1,6 @@
-import { HandlerType } from "../handlerType";
+import { Handler } from "../handlerType";
 
-const includeTimestamp: HandlerType = (req, _, next) => {
+const includeTimestamp: Handler = (req, _, next) => {
     req.requestTime = Date.now();
     next();
 }

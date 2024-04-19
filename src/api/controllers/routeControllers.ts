@@ -1,6 +1,6 @@
 import { Departure, Stop } from "../../database/types";
 import { getDayOfWeek, getStringForNow, parseDate } from "../../utils.ts/dateUtils";
-import { DbToApi } from "../../utils.ts/mappingUtils";
+import { dbToApi } from "../../utils.ts/mappingUtils";
 import { Company, companyArray } from "../companies";
 import { HandlerWithQueryAndParamsType, HandlerWithQueryType } from "../handlerType";
 import { QueryResponseType } from "../responseType";
@@ -43,7 +43,7 @@ export const getRoutesForStop: HandlerWithQueryAndParamsType<{ date: string; }, 
     const promises = [];
     for (const { controller, code } of companies) {
         try {
-            const [trips, routes, calendars, stopTimes, stops] = controller.getTables(["trips", "routes", "calendars", "stop_times", "stops"]);
+            const [trips, routes, calendars, stopTimes, stops] = controller.getTableNames(["trips", "routes", "calendars", "stop_times", "stops"]);
             const variables = [params.stopId, startDate];
             const dayOfWeek = getDayOfWeek(parseDate(startDate));
             const queryString = `
@@ -101,7 +101,6 @@ export const getRoutesForStop: HandlerWithQueryAndParamsType<{ date: string; }, 
     const data = await Promise.all(promises);
 
     const groups = groupDepartures(data, startDate);
-
     res.status(200).json(new QueryResponseType(Object.values(groups), { ...query, ...params }));
 };
 
@@ -111,7 +110,7 @@ export const getRoutesForDay: HandlerWithQueryType<{ date: string; page: string 
     const offset = query.page ? Number(query.page) : 0;
     for (const { controller, code } of companyArray) {
         try {
-            const [trips, routes, calendars, stopTimes, stops] = controller.getTables(["trips", "routes", "calendars", "stop_times", "stops"]);
+            const [trips, routes, calendars, stopTimes, stops] = controller.getTableNames(["trips", "routes", "calendars", "stop_times", "stops"]);
             const variables = [startDate];
             const dayOfWeek = getDayOfWeek(parseDate(startDate));
             const queryString = `
@@ -175,7 +174,6 @@ export const getRoutesForDay: HandlerWithQueryType<{ date: string; page: string 
     }
     const data = await Promise.all(promises);
     const groups = groupDepartures(data, startDate);
-    console.log(Object.values(groups).length)
     res.status(200).json(new QueryResponseType(Object.values(groups), { ...query }));
 }
 
@@ -186,5 +184,5 @@ export const getRoutesForDay: HandlerWithQueryType<{ date: string; page: string 
  * @returns The API-formatted departure data.
  */
 export function mapToApiStop(stop: Departure, companyCode: string) {
-    return DbToApi<Departure, ApiDeparture>(stop, [{ key: "companyCode", value: companyCode }])
+    return dbToApi<Departure, ApiDeparture>(stop, [{ key: "companyCode", value: companyCode }])
 }

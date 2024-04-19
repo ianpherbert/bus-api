@@ -74,7 +74,7 @@ export class DbController {
     * @param tables - An array of table names
     * @returns An array of table names prefixed with the schema
     */
-    getTables(tables: string[]) {
+    getTableNames(tables: string[]) {
         return tables.map(it => `${this.schema}.${it}`)
     }
     /**

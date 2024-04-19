@@ -4,7 +4,7 @@ import { Request, Response, NextFunction } from "express";
  * Represents a request with an optional timestamp.
  * @property [requestTime] - The timestamp when the request was received.
  */
-type TimestampedRequest = Request & { requestTime?: number };
+export type TimestampedRequest = Request & { requestTime?: number };
 
 /**
  * Represents a generic handler type for Express routes.
@@ -13,7 +13,7 @@ type TimestampedRequest = Request & { requestTime?: number };
  * @param res - The HTTP response object.
  * @param next - The callback to trigger the next middleware.
  */
-export type HandlerType = (req: TimestampedRequest, res: Response, next: NextFunction) => void;
+export type Handler = (req: TimestampedRequest, res: Response, next: NextFunction) => void;
 
 /**
  * Represents a handler that expects URL parameters.
@@ -45,3 +45,5 @@ export type HandlerWithQueryType<T extends {}> = (req: Omit<TimestampedRequest, 
  * @param {NextFunction} next - The middleware next function.
  */
 export type HandlerWithQueryAndParamsType<T extends {}, P extends {}> = (req: Omit<TimestampedRequest, "query" | "params"> & { query: T & { exact?: string }, params: P }, res: Response, next: NextFunction) => void;
+
+export type HandlerType = Handler | HandlerWithParamsType | HandlerWithQueryType | HandlerWithQueryAndParamsType
