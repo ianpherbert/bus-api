@@ -5,6 +5,7 @@ import includeTimestamp from "./api/middleware/timeStamp";
 import departureRouter from "./api/routes/routeRoutes";
 import { postgresClient } from "./database/DBcontroller";
 import cacheCalls from "./api/middleware/cacheCalls";
+import locationRouter from "./api/routes/locationRoutes";
 
 const app = express();
 
@@ -20,5 +21,6 @@ app.listen(PORT, async () => {
 app.use(includeTimestamp, cacheCalls);
 app.use("/stop", stopRouter);
 app.use("/route", departureRouter);
+app.use("/location", locationRouter)
 app.get("/ping", (_a, b) => b.status(200).json({ message: "OK" }))
 export default app;
