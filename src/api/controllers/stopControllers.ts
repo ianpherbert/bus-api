@@ -1,4 +1,5 @@
 import { Stop } from "../../database/types";
+import { ApiError, MissingArgumentError, TypeMismatchError } from "../../errors/ApiErrors";
 import { DbError } from "../../errors/DbErrors";
 import { dbToApi } from "../../utils.ts/mappingUtils";
 import { normaliseStringToArray } from "../../utils.ts/stringUtils";
@@ -26,8 +27,6 @@ const typeColumnMapping: { [key in SearchStopQueryType]: keyof Stop } = {
 const typeNames = Object.keys(typeColumnMapping).reduce((a, b) => a + ", " + b);
 /**
  * Searches for stops based on a query.
- * @param context - The query context including the query, query type, and optional company filter.
- * @param res - The response object to send back HTTP responses.
  * @throws Throws an error if query fails.
  */
 export const searchStop: HandlerWithQueryType<{ queryString: string, queryType: SearchStopQueryType, companies?: string }> = async ({ query, requestTime }, res) => {
@@ -37,7 +36,7 @@ export const searchStop: HandlerWithQueryType<{ queryString: string, queryType: 
     const companyList = companyString ? normaliseStringToArray(companyString)?.map(it => companies[it]).filter(Boolean) : companyArray;
 
     if (queryString && !queryType) {
-        res.status(400).json({ message: "queryType is mandatory with queryString" })
+        res.status(400).json(new MissingArgumentError("queryType is mandatory with queryString", queryType, typeNames))
         return;
     }
 
@@ -52,7 +51,7 @@ export const searchStop: HandlerWithQueryType<{ queryString: string, queryType: 
 
     const column = typeColumnMapping[queryType];
     if (!column) {
-        res.status(400).json({ message: `queryType must be of type: ${typeNames}. provided: ${queryType}` });
+        res.status(400).json(new TypeMismatchError(`queryType must be of type: ${typeNames}. provided: ${queryType}`, "queryType", queryType, typeNames));
         return;
     }
 
@@ -73,8 +72,6 @@ export const searchStop: HandlerWithQueryType<{ queryString: string, queryType: 
 
 /**
  * Retrieves a stop by ID.
- * @param params - The handler parameters including the stop ID.
- * @param res - The response object to send back HTTP responses.
  * @throws Throws an error if query fails.
  */
 export const getStop: HandlerWithParamsType<{ stopId: string }> = async ({ params, requestTime }, res) => {
@@ -88,7 +85,7 @@ export const getStop: HandlerWithParamsType<{ stopId: string }> = async ({ param
         res.status(200).json(new QueryResponseType<Stop>(entries.flat(), params, requestTime));
     } catch (e) {
         const error = e as DbError;
-        res.status(error.code ?? 500).json({ message: e })
+        res.status(error.code ?? 500).json(new ApiError(error.message, 500))
     }
 }
 

@@ -1,4 +1,5 @@
 import { Departure, Stop } from "../../database/types";
+import { ApiError } from "../../errors/ApiErrors";
 import { getDayOfWeek, getStringForNow, parseDate } from "../../utils.ts/dateUtils";
 import { dbToApi } from "../../utils.ts/mappingUtils";
 import { Company, companyArray } from "../companies";
@@ -46,7 +47,7 @@ export const getRoutesForStop: HandlerWithQueryAndParamsType<{ date?: string; },
             const data = await controllers.route.getRoutesForStop(params.stopId, query.date).then(a => a.map(it => mapToApiStop(it, code)));
             promises.push(data);
         } catch (e) {
-            res.status(400).json({ message: e });
+            res.status(400).json(new ApiError(e as string, 400));
             return;
         }
 
@@ -66,8 +67,8 @@ export const getRoutesForDay: HandlerWithQueryType<{ date: string; page: string 
 
             const data = await controllers.route.getRoutesForDay(offset).then(a => a.map(it => mapToApiStop(it, code)));
             promises.push(data);
-        } catch (e) {
-            res.status(400).json({ message: e });
+        } catch (e: unknown) {
+            res.status(400).json(new ApiError(e as string, 400));
             return;
         }
 
