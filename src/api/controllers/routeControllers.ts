@@ -13,11 +13,11 @@ import { ApiDeparture, DepartureGroup } from "../types";
  * @param tableName - The name of the database table to search.
  * @returns  - A promise that resolves to an array of companies that match the given criteria.
  */
-export async function findCompany<T>(key: keyof T, value: string, tableName: string) {
+export async function findCompany(value: string) {
     const companies: Company[] = [];
-    const promises = companyArray.map((company) => company.controller.checkValue<T>(tableName, [[key, value, "eq"]]).then(found => {
-        if (found) companies.push(company)
-    }));
+    const promises = companyArray.map((company) => company.controllers.company.findCompany(value).then(found => {
+            if (found) companies.push(company)
+        }));
     await Promise.all(promises);
     return companies
 }
@@ -38,7 +38,7 @@ function groupDepartures(data: ApiDeparture[][], startDate: string) {
  * Handler to get departures for a specified stop on a given date.
  */
 export const getRoutesForStop: HandlerWithQueryAndParamsType<{ date?: string; }, { stopId: string; }> = async ({ params, query }, res) => {
-    const companies = await findCompany<Stop>("stop_id", params.stopId, "stops");
+    const companies = await findCompany(params.stopId);
     const startDate = query.date ?? getStringForNow();
     const promises = [];
     for (const { code, controllers } of companies) {

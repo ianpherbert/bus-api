@@ -41,13 +41,13 @@ export const searchStop: HandlerWithQueryType<{ queryString: string, queryType: 
         return;
     }
 
-    async function doCoordinateSearch({ controller, code }: Company) {
+    async function doCoordinateSearch({ code, controllers }: Company) {
         const [lat, lon] = queryString.split(",");
-        return controller.query<Stop>("stops", [["stop_lat", lat, "eq"], ["stop_lon", lon, "eq"]]).then(a => a.map(it => mapToApiStop(it, code)));
+        return controllers.stop.findByCoordinates(lat, lon).then(a => a.map(it => mapToApiStop(it, code)));
     }
 
-    async function doPropertySearch({ controller, code }: Company) {
-        return controller.query<Stop>("stops", [[column, queryString, exact ? "eq" : "like"]]).then(a => a.map(it => mapToApiStop(it, code)));
+    async function doPropertySearch({ controllers, code }: Company) {
+        return controllers.stop.findByProperty(column, queryString, Boolean(exact)).then(a => a.map(it => mapToApiStop(it, code)));
     }
 
     const column = typeColumnMapping[queryType];
@@ -80,8 +80,8 @@ export const searchStop: HandlerWithQueryType<{ queryString: string, queryType: 
 export const getStop: HandlerWithParamsType<{ stopId: string }> = async ({ params, requestTime }, res) => {
     try {
         const promises = []
-        for (const { controller, code } of companyArray) {
-            const promise = controller.query<Stop>("stops", [["stop_id", params.stopId, "like"]]).then(a => a.map(it => mapToApiStop(it, code)));
+        for (const { controllers, code } of companyArray) {
+            const promise = controllers.stop.getById(params.stopId).then(a => a.map(it => mapToApiStop(it, code)));
             promises.push(promise);
         }
         const entries = await Promise.all(promises)

@@ -1,16 +1,25 @@
-import { DbController } from "../database/DBcontroller";
+import { CompanyDbController } from "../database/controllers/CompanyController";
 import { RouteDBController } from "../database/controllers/RouteController";
+import { StopDbController } from "../database/controllers/StopController";
 
 export type Company = {
     dbName: string;
     displayName: string;
     code: string;
-    controller: DbController,
     name: keyof typeof companies;
     controllers: {
         route: RouteDBController;
+        stop: StopDbController;
+        company: CompanyDbController;
     }
 }
+
+const dbs = (name: string) => ({
+    route: new RouteDBController(name),
+    stop: new StopDbController(name),
+    company: new CompanyDbController(name)
+})
+
 /** Use only lowercase letters for the keys, the search will be normalised in order to minimize inconsistencies */
 export const companies: { [key: string]: Company } = {
     flixbus: {
@@ -18,20 +27,14 @@ export const companies: { [key: string]: Company } = {
         name: "flixbus",
         displayName: "Flix Bus",
         code: "fbx",
-        controller: new DbController("flixbus"),
-        controllers: {
-            route: new RouteDBController("flixbus")
-        }
+        controllers: dbs("flixbus")
     },
     blablabus: {
         dbName: "blabla_bus",
         displayName: "Bla Bla Bus",
         code: "bbb",
-        controller: new DbController("blabla_bus"),
         name: "blablabus",
-        controllers: {
-            route: new RouteDBController("blabla_bus")
-        }
+        controllers: dbs("blabla_bus")
     }
 }
 
