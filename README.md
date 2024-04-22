@@ -47,3 +47,21 @@ Contributions are welcome! Please feel free to submit a pull request.
 License
 
 This project is licensed under the ISC License - see the LICENSE.md file for details.
+
+ - **/stop**
+	 - queryString [string] **required*
+	 - queryType ["name" | "coordinates"] ****required***
+ - **/stop/:stopId**
+ - **/route**
+	 - date [string (yyyymmdd)]  ***optional*** 
+	 - page [number] ***optional***
+ - **/route/stop/:stopId**
+	 - date [string (yyyymmdd)]  ***optional*** 
+ - **/location**
+	 - name [string] ***optional***
+	 - id [string] ***optional***
+	 - postalcode [string] ***optional***
+		 - **One query item is required**
+ - **/company**
+ - **/health**
+
