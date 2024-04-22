@@ -30,7 +30,7 @@ export const functionalOperands: { [key in DbOperand]: string } = {
  * Represents an argument for a database query.
  * @typeparam T - The type of the object being queried
  */
-type DbArg<T> = [keyof T, any, DbOperand]
+export type DbArg<T> = [keyof T, any, DbOperand]
 
 /**
  * A controller for interacting with the PostgreSQL database.

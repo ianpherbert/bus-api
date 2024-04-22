@@ -61,3 +61,20 @@ export type Departure = {
     stop_sequence: number;
     stop_timezone: string;
 }
+
+export type LocationItem = Stop & {
+    id: string;
+    name: string;
+    postalcode: string;
+    countrycode: string;
+    company: string;
+}
+
+export type Location = {
+    id: string;
+    name: string;
+    postalcode: string;
+    countrycode: string;
+    stops: (Stop & { company: string })[];
+}
+

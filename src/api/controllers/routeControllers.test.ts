@@ -31,25 +31,25 @@ function generateMockDepartures(num: number): Departure[] {
 jest.mock('../companies', () => ({
     companies: {
         "Company1": {
-            controller: {
-                checkValue: () => new Promise(res => res(true)),
-                customQuery: (_: string, _1: [string, string][]) => {
-                    return new Promise((res) => res(generateMockDepartures(50)))
+            controllers: {
+                route: {
+                    getRoutesForStop: () => new Promise(res => res(generateMockDepartures(50))),
+                    getRoutesForDay: () => new Promise(res => res(generateMockDepartures(50))),
                 },
-                getTableNames: (tables: string[]) => {
-                    return tables.map(it => `${"test"}.${it}`)
+                company: {
+                    findCompany: () => new Promise(res => res(true))
                 }
             }, code: "C1"
         }
     },
     companyArray: [{
-        controller: {
-            checkValue: () => new Promise(res => res(true)),
-            customQuery: (_: string, _1: [string, string][]) => {
-                return new Promise((res) => res(generateMockDepartures(50)))
+        controllers: {
+            route: {
+                getRoutesForStop: () => new Promise(res => res(generateMockDepartures(50))),
+                getRoutesForDay: () => new Promise(res => res(generateMockDepartures(50))),
             },
-            getTableNames: (tables: string[]) => {
-                return tables.map(it => `${"test"}.${it}`)
+            company: {
+                findCompany: () => new Promise(res => res(true))
             }
         }, code: "C1"
     }]

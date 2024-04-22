@@ -42,22 +42,25 @@ const mockStops = [{
 jest.mock('../companies', () => ({
     companies: {
         "Company1": {
-            controller: {
-                query: (_: string, _1: [string, string][]) => {
-                    return new Promise((res) => res(mockStops))
+            controllers: {
+                stop: {
+                    getById: () => new Promise((res) => res(mockStops)),
+                    findByCoordinates: () => new Promise(res => res(mockStops)),
+                    findByProperty: () => new Promise(res => res(mockStops))
                 }
             }, code: "C1"
         }
     },
     companyArray: [{
-        controller: {
-            query: (_: string, _1: [string, string][]) => {
-                return new Promise((res) => res(mockStops))
+        controllers: {
+            stop: {
+                getById: () => new Promise((res) => res(mockStops)),
+                findByCoordinates: () => new Promise(res => res(mockStops)),
+                findByProperty: () => new Promise(res => res(mockStops))
             }
         }, code: "C1"
     }]
 }));
-
 
 
 describe('searchStop', () => {
@@ -66,14 +69,14 @@ describe('searchStop', () => {
         const { res } = getMockRes()
         searchStop(req, res, jest.fn());
         expect(res.status).toHaveBeenCalledWith(400);
-        expect(res.json).toHaveBeenCalledWith({ message: "queryType is mandatory with queryString" });
+        expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ message: "queryType is mandatory with queryString" }));
     });
     test('should return code 400 with invalid type', async () => {
         const req = getMockReq({ query: { queryString: 'someQuery', queryType: "test" }, requestTime: Date.now() }) as Omit<TimestampedRequest, "query"> & { query: any };
         const { res } = getMockRes()
         searchStop(req, res, jest.fn());
         expect(res.status).toHaveBeenCalledWith(400);
-        expect(res.json).toHaveBeenCalledWith({ message: "queryType must be of type: name, coordinates. provided: test" });
+        expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ message: "queryType must be of type: name, coordinates. provided: test" }));
     });
     test('should return items with 200 name search', async () => {
         const req = getMockReq({ query: { queryString: 'someQuery', queryType: "name", requestTime: Date.now().toString() } }) as Omit<TimestampedRequest, "query"> & { query: any };
