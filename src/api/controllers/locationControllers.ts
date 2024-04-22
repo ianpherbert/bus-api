@@ -1,4 +1,4 @@
-import { LocationDBController } from "../../database/LocationController";
+import { LocationDBController } from "../../database/controllers/LocationController";
 import { hasValues } from "../../utils.ts/objectUtils";
 import { HandlerWithQueryType } from "../handlerType";
 import { QueryResponseType } from "../responseType";

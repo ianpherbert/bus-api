@@ -1,5 +1,5 @@
-import { DbArg, DbController } from "./DBcontroller";
-import { Location, LocationItem } from "./types";
+import { DbArg, DbController } from "../DBcontroller";
+import { Location, LocationItem } from "../types";
 
 export class LocationDBController {
     tables = {
