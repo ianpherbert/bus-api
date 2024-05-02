@@ -1,15 +1,13 @@
-name: Build and Push Docker Image
+name: Build, Push and Deploy
 
-# on:
-#   push:
-#     branches:
-#       - main
 on:
-  pull_request:
+  push:
     branches:
       - main
+
 jobs:
   build-and-push:
+    name: Build and Push Docker Image to DockerHub
     runs-on: ubuntu-latest
 
     steps:
@@ -32,28 +30,29 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: ianpherbert/bus-api:latest
+
   deploy:
+    name: Deploy Docker Image to Heroku
+    needs: build-and-push
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+      - name: Heroku Login
+        uses: akhileshns/heroku-deploy@v3.12.12
+        with:
+          heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
+          heroku_email: ${{ secrets.HEROKU_EMAIL }}
+          heroku_app_name: "wander-bus-api"
 
-    - name: Heroku Login
-      uses: akhileshns/heroku-deploy@v3.12.12
-      with:
-        heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
-        heroku_email: ${{ secrets.HEROKU_EMAIL }}
-        heroku_app_name: "wander-bus-api"
+      - name: Pull and tag Docker image from DockerHub
+        run: |
+          heroku container:login
+          docker pull ianpherbert/bus-api:latest
+          docker tag ianpherbert/bus-api:latest registry.heroku.com/${{ secrets.HEROKU_APP_NAME }}/web
 
-    - name: Pull Docker image from DockerHub
-      run: |
-        heroku container:login
-        docker pull ianpherbert/bus-api:latest
-        docker tag ianpherbert/bus-api:latest registry.heroku.com/${{ secrets.HEROKU_APP_NAME }}/web
+      - name: Push Docker image to Heroku
+        run: |
+          docker push registry.heroku.com/${{ secrets.HEROKU_APP_NAME }}/web
 
-    - name: Push Docker image to Heroku
-      run: |
-        docker push registry.heroku.com/${{ secrets.HEROKU_APP_NAME }}/web
-
-    - name: Release the image on Heroku
-      run: heroku container:release web -a ${{ secrets.HEROKU_APP_NAME }}
+      - name: Release the image on Heroku
+        run: heroku container:release web -a ${{ secrets.HEROKU_APP_NAME }}
