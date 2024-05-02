@@ -32,6 +32,28 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: ianpherbert/bus-api:latest
+  deploy:
+    runs-on: ubuntu-latest
 
-      - name: Run tests (optional)
-        run: docker run --rm ianpherbert/bus-api:latest npm test
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Heroku Login
+      uses: akhileshns/heroku-deploy@v3.12.12
+      with:
+        heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
+        heroku_email: ${{ secrets.HEROKU_EMAIL }}
+        heroku_app_name: "your-heroku-app-name"
+
+    - name: Pull Docker image from DockerHub
+      run: |
+        heroku container:login
+        docker pull yourusername/bus-api:latest
+        docker tag yourusername/bus-api:latest registry.heroku.com/${{ secrets.HEROKU_APP_NAME }}/web
+
+    - name: Push Docker image to Heroku
+      run: |
+        docker push registry.heroku.com/${{ secrets.HEROKU_APP_NAME }}/web
+
+    - name: Release the image on Heroku
+      run: heroku container:release web -a ${{ secrets.HEROKU_APP_NAME }}
