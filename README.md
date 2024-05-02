@@ -46,8 +46,6 @@ npm run test-coverage
 Contributions are welcome! Please feel free to submit a pull request.
 License
 
-This project is licensed under the ISC License - see the LICENSE.md file for details.
-
  - **/stop**
 	 - queryString [string] **required*
 	 - queryType ["name" | "coordinates"] ****required***
