@@ -43,13 +43,13 @@ jobs:
       with:
         heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
         heroku_email: ${{ secrets.HEROKU_EMAIL }}
-        heroku_app_name: "your-heroku-app-name"
+        heroku_app_name: "wander-bus-api"
 
     - name: Pull Docker image from DockerHub
       run: |
         heroku container:login
-        docker pull yourusername/bus-api:latest
-        docker tag yourusername/bus-api:latest registry.heroku.com/${{ secrets.HEROKU_APP_NAME }}/web
+        docker pull ianpherbert/bus-api:latest
+        docker tag ianpherbert/bus-api:latest registry.heroku.com/${{ secrets.HEROKU_APP_NAME }}/web
 
     - name: Push Docker image to Heroku
       run: |
