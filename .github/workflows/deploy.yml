@@ -7,22 +7,17 @@ on:
 
 jobs:
   build-and-push:
-    name: Build and Push Docker Image to DockerHub
     runs-on: ubuntu-latest
-
     steps:
       - name: Check out the repo
         uses: actions/checkout@v3
-
       - name: Log in to DockerHub
         uses: docker/login-action@v1
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
-
       - name: Build and push Docker image
         uses: docker/build-push-action@v3
         with:
@@ -32,27 +27,15 @@ jobs:
           tags: ianpherbert/bus-api:latest
 
   deploy:
-    name: Deploy Docker Image to Heroku
-    needs: build-and-push
     runs-on: ubuntu-latest
-
+    needs: build-and-push
     steps:
-      - name: Heroku Login
+      - name: Check out the repo (For Git Context)
+        uses: actions/checkout@v3
+      - name: Heroku Login and Deploy
         uses: akhileshns/heroku-deploy@v3.12.12
         with:
           heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
-          heroku_email: ${{ secrets.HEROKU_EMAIL }}
+          heroku_email: hello@wanderbyway.com
           heroku_app_name: "wander-bus-api"
-
-      - name: Pull and tag Docker image from DockerHub
-        run: |
-          heroku container:login
-          docker pull ianpherbert/bus-api:latest
-          docker tag ianpherbert/bus-api:latest registry.heroku.com/${{ secrets.HEROKU_APP_NAME }}/web
-
-      - name: Push Docker image to Heroku
-        run: |
-          docker push registry.heroku.com/${{ secrets.HEROKU_APP_NAME }}/web
-
-      - name: Release the image on Heroku
-        run: heroku container:release web -a ${{ secrets.HEROKU_APP_NAME }}
+          usedocker: true
