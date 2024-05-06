@@ -24,7 +24,7 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ianpherbert/bus-api:latest
+          tags: ianpherbert/bus-api:${{ github.sha }}
 
   deploy:
     runs-on: ubuntu-latest
@@ -39,3 +39,4 @@ jobs:
           heroku_email: hello@wanderbyway.com
           heroku_app_name: "wander-bus-api"
           usedocker: true
+          docker_image: "ianpherbert/bus-api:${{ github.sha }}"
