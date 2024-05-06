@@ -1,3 +1,5 @@
+import { CompanyCode } from "../api/companies";
+
 // TypeScript Types
 export type Route = {
     route_id: string;
@@ -67,7 +69,7 @@ export type LocationItem = Stop & {
     name: string;
     postalcode: string;
     countrycode: string;
-    company: string;
+    company: CompanyCode;
 }
 
 export type Location = {
@@ -75,6 +77,6 @@ export type Location = {
     name: string;
     postalcode: string;
     countrycode: string;
-    stops: (Stop & { company: string })[];
+    stops: (Stop & { company: CompanyCode })[];
 }
 

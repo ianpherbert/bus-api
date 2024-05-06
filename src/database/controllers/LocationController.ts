@@ -1,3 +1,4 @@
+import { DbNotFoundError } from "../../errors/DbErrors";
 import { DbArg, DbController } from "../DBcontroller";
 import { Location, LocationItem } from "../types";
 
@@ -8,6 +9,12 @@ export class LocationDBController {
     controller: DbController;
     constructor() {
         this.controller = new DbController("bus_api");
+    }
+
+    async findById(id: string) {
+        const results = await this.findByNamePostalCodeOrId(id)
+        if (!Boolean(results.length)) throw new DbNotFoundError("Not found", 404)
+        return results[0]
     }
 
     async findByNamePostalCodeOrId(id?: string, postalcode?: string, name?: string) {

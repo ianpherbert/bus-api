@@ -23,7 +23,7 @@ export async function findCompany(value: string) {
     return companies
 }
 
-function groupDepartures(data: ApiDeparture[][], startDate: string) {
+export function groupDepartures(data: ApiDeparture[][], startDate: string) {
     const groups: { [key: string]: DepartureGroup; } = {};
     for (const item of data.flat()) {
         if (!groups[item.trip_id]) {

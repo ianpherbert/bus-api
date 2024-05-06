@@ -2,11 +2,20 @@ import { CompanyDbController } from "../database/controllers/CompanyController";
 import { RouteDBController } from "../database/controllers/RouteController";
 import { StopDbController } from "../database/controllers/StopController";
 
+export type CompanyCode = "fbx" | "bbb";
+export type CompanyName = "flixbus" | "blablabus"
+
+
+const codeMapping: {[key in CompanyCode] : CompanyName} = {
+    fbx : "flixbus",
+    bbb: "blablabus"
+}
+
 export type Company = {
     dbName: string;
     displayName: string;
-    code: string;
-    name: keyof typeof companies;
+    code: CompanyCode;
+    name: CompanyName;
     controllers: {
         route: RouteDBController;
         stop: StopDbController;
@@ -21,7 +30,7 @@ const dbs = (name: string) => ({
 })
 
 /** Use only lowercase letters for the keys, the search will be normalised in order to minimize inconsistencies */
-export const companies: { [key: string]: Company } = {
+export const companies: { [key in CompanyName]: Company } = {
     flixbus: {
         dbName: "flixbus",
         name: "flixbus",
@@ -38,4 +47,8 @@ export const companies: { [key: string]: Company } = {
     }
 }
 
-export const companyArray = Object.values(companies)
+export const companyArray = Object.values(companies);
+
+export function getCompanyFromCode(companyCode: CompanyCode) {
+    return companies[codeMapping[companyCode]]
+}
