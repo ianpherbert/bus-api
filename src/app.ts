@@ -24,5 +24,15 @@ app.use("/stop", stopRouter);
 app.use("/route", departureRouter);
 app.use("/location", locationRouter);
 app.use("/company", companyRouter);
-app.get("/ping", (_a, b) => b.status(200).json({ message: "OK" }))
+app.get("/ping", (_a, b) => {
+  return b.status(200).json({ message: "OK" })
+})
+app.get("/endpoints", (_, res) => res.json({
+  stopRouter: stopRouter.stack.map(it => it.route.path),
+  departureRouter: departureRouter.stack.map(it => it.route.path),
+  locationRouter: locationRouter.stack.map(it => it.route.path),
+  companyRouter: companyRouter.stack.map(it => it.route.path)
+}))
+
+
 export default app;
