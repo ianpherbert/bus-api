@@ -24,7 +24,8 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ianpherbert/bus-api:${{ github.sha }}
+          no-cache: true
+          tags: ianpherbert/bus-api:latest
 
   deploy:
     runs-on: ubuntu-latest
