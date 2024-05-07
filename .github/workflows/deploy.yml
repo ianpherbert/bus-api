@@ -40,4 +40,4 @@ jobs:
           heroku_email: hello@wanderbyway.com
           heroku_app_name: "wander-bus-api"
           usedocker: true
-          docker_image: "ianpherbert/bus-api:${{ github.sha }}"
+          docker_image: "ianpherbert/bus-api:latest"
