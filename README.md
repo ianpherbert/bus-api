@@ -1,6 +1,6 @@
 # Bus-API
 
-The `Wander By Way bus api` is a Node.js API designed to streamline the retrieval of long-distance bus route information across Europe. Currently, the API integrates data from popular bus services like BlaBlaCar Bus and FlixBus schedule information.
+This is a Node.js API designed to streamline the retrieval of long-distance bus route information across Europe. Currently, the API integrates data from popular bus services like BlaBlaCar Bus and FlixBus schedule information.
 
 ## Features
 
